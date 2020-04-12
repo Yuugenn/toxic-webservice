@@ -1,3 +1,14 @@
+.idea
+
+backend/app/.idea
+
+frontend/node_modules
+frontend/.idea
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
