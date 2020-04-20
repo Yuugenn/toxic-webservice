@@ -7,6 +7,7 @@ frontend/.idea
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
+frontend/yarn.lock
 
 
 # Byte-compiled / optimized / DLL files
