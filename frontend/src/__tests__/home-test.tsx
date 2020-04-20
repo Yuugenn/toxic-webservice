@@ -1,10 +1,10 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import Home from '../components/Home';
+import Content from '../components/Content';
 
-it('Home renders correctly', () => {
-  const tree = renderer
-    .create(<Home />)
-    .toJSON();
-  expect(tree).toMatchSnapshot();
+it('Content renders correctly', () => {
+	const tree = renderer
+		.create(<Content/>)
+		.toJSON();
+	expect(tree).toMatchSnapshot();
 });
