@@ -1,0 +1,51 @@
+env:
+  browser: true
+  es6: true
+  jest: true
+extends:
+- react-app
+- plugin:react/all
+- plugin:import/errors
+- plugin:import/warnings
+- plugin:import/typescript
+- plugin:jsx-a11y/recommended
+globals:
+  Atomics: readonly
+  SharedArrayBuffer: readonly
+parser: '@typescript-eslint/parser'
+parserOptions:
+  ecmaFeatures:
+    jsx: true
+  ecmaVersion: 2018
+  sourceType: module
+  project: './tsconfig.json'
+plugins:
+  - '@typescript-eslint'
+  - react
+  - react-hooks
+  - jsx-a11y
+settings:
+  import/resolver:
+    node:
+      extensions: [.js, .jsx, .ts, .tsx]
+rules:
+  indent: [error, tab, {
+    SwitchCase: 1,
+    FunctionDeclaration: {parameters: off},
+    FunctionExpression: {parameters: off}
+  }]
+  react/jsx-no-literal: off
+  react/forbid-component-props: off
+  react/jsx-sort-props: off
+  react/jsx-filename-extension: [error, {extensions: ['.tsx']}]
+  react/jsx-indent: [error, tab]
+  react/jsx-indent-props: [error, tab]
+  react/jsx-tag-spacing: [error, {
+    closingSlash: never,
+    beforeSelfClosing: never,
+    afterOpening: never,
+    beforeClosing: never
+  }]
+  react/jsx-max-depth: [error, {max: 6}]
+  react/jsx-max-props-per-line: [error, {when: multiline}]
+
