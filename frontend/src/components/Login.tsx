@@ -5,8 +5,12 @@ import {useHistory} from "react-router-dom";
 import {API_URL} from "../config";
 
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((theme:Theme) => ({
 
+    form: {
+        display: "flex",
+        flexDirection: "column"
+    },
     textField: {
 		flex: "1",
 		marginBottom: "24px"
@@ -30,8 +34,12 @@ function Login() {
     const [isLoading, setLoading ] = useState<boolean>( false );
 
 
-	const login = async () => {
+	const login = async (event:any) => {
 
+        // prevent reload of the site (form submit)
+        event.preventDefault();
+
+        setError( "" );
         setLoading( true );
 
         const body = {
@@ -58,13 +66,15 @@ function Login() {
 
     return (
         <Paper className="paper">
-            <TextField label="E-Mail"   variant="outlined" className={classes.textField}                 value={email}    onChange={(e) => setEmail(e.target.value)}    />
-            <TextField label="Passwort" variant="outlined" className={classes.textField} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            {error && (<p className={classes.error}>{error}</p>)}
-            <div>
-                <Button variant="contained" color="primary" onClick={login}>Anmelden</Button>
-                {isLoading && (<CircularProgress />)}
-            </div>
+            <form className={classes.form} onSubmit={login}>
+                <TextField label="E-Mail"   variant="outlined" className={classes.textField}                 value={email}    onChange={(e) => setEmail(e.target.value)}    />
+                <TextField label="Passwort" variant="outlined" className={classes.textField} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                {error && (<p className={classes.error}>{error}</p>)}
+                <div>
+                    <Button variant="contained" color="primary" type="submit">Anmelden</Button>
+                    {isLoading && (<CircularProgress />)}
+                </div>
+            </form>
         </Paper>
     );
 }
