@@ -1,5 +1,5 @@
 import {makeStyles, Theme} from "@material-ui/core";
-import {Button, CircularProgress, Paper, TextField} from "@material-ui/core";
+import {Button, CircularProgress, Link, Paper, TextField} from "@material-ui/core";
 import React, {useState} from "react";
 import {useHistory} from "react-router-dom";
 import {API_URL} from "../config";
@@ -11,8 +11,13 @@ const useStyles = makeStyles((theme:Theme) => ({
         display: "flex",
         flexDirection: "column"
     },
+    label: {
+        display: "flex",
+        justifyContent: "space-between"
+    },
     textField: {
 		flex: "1",
+        marginTop: "12px",
 		marginBottom: "24px"
 	},
 	error: {
@@ -67,8 +72,16 @@ function Login() {
     return (
         <Paper className="paper">
             <form className={classes.form} onSubmit={login}>
-                <TextField label="E-Mail"   variant="outlined" className={classes.textField}                 value={email}    onChange={(e) => setEmail(e.target.value)}    />
-                <TextField label="Passwort" variant="outlined" className={classes.textField} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <div className={classes.label}>
+                    <span>E-Mail</span>
+                    <Link href="/register">Registrieren</Link>
+                </div>
+                <TextField variant="outlined" className={classes.textField} value={email} onChange={(e) => setEmail(e.target.value)} />
+                <div className={classes.label}>
+                    <span>Passwort</span>
+                    <Link href="/forget-password">Passwort vergessen</Link>
+                </div>
+                <TextField variant="outlined" className={classes.textField} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 {error && (<p className={classes.error}>{error}</p>)}
                 <div>
                     <Button variant="contained" color="primary" type="submit">Anmelden</Button>
