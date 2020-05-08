@@ -11,10 +11,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 	container: {
 		display: 'flex',
 		flexDirection: 'column',
-	},
-	content: {
-		width: '50%',
-		margin: '50px auto'
 	}
 }));
 
@@ -26,9 +22,7 @@ function App() {
 	return (
 		<div className={classes.container}>
 			<NavigationBar />
-			<div className={classes.content}>
-				<Content />
-			</div>
+			<Content />
 		</div>
 	);
 }
