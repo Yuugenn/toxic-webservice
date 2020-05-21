@@ -4,6 +4,7 @@ from starlette.requests import Request
 
 from app.core import config
 from app.db.session import SessionLocal
+from .api.api_v1.api import api_router
 
 from .api.api_v1.endpoints import chemicals
 
@@ -34,7 +35,8 @@ if config.BACKEND_CORS_ORIGINS:
         allow_headers=["*"],
     ),
 
-app.include_router(chemicals.router)
+app.include_router(api_router)
+
 
 @app.middleware("http")
 async def db_session_middleware(request: Request, call_next):
