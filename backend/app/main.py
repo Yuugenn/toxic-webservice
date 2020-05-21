@@ -5,6 +5,9 @@ from starlette.requests import Request
 from app.core import config
 from app.db.session import SessionLocal
 
+from .routers import chemical_controller
+
+
 app = FastAPI(
     title=config.PROJECT_NAME,
     openapi_url="/api/v1/openapi.json",
@@ -32,6 +35,7 @@ if config.BACKEND_CORS_ORIGINS:
         allow_headers=["*"],
     ),
 
+app.include_router(chemical_controller.router)
 
 @app.middleware("http")
 async def db_session_middleware(request: Request, call_next):
