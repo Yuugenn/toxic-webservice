@@ -17,19 +17,29 @@ chemicals = [chem1, chem2, chem3, chem4]
 
 
 @router.get("/", response_model=List[schemas.Chemical])
+async def get_chemical():
+    return chemicals
+
+
+@router.get("/{chem_id}", response_model=schemas.Chemical)
 async def get_chemical(
-        chem_id: int = None,
-        code: str = None,
-        smiles: str = None
+        chem_id: int
 ):
-    if chem_id is not None:
-        return [next((x for x in chemicals if x.id == chem_id), None)]
-    elif code is not None:
-        return [next((x for x in chemicals if x.code == code), None)]
-    elif smiles is not None:
-        return [next((x for x in chemicals if x.smiles == smiles), None)]
-    else:
-        return chemicals
+    return next((x for x in chemicals if x.id == chem_id), None)
+
+
+@router.get("/codes/{code}", response_model=schemas.Chemical)
+async def get_chemical(
+        code: str
+):
+    return next((x for x in chemicals if x.code == code), None)
+
+
+@router.get("/smiles/{smiles}", response_model=schemas.Chemical)
+async def get_chemical(
+        smiles: str
+):
+    return next((x for x in chemicals if x.smiles == smiles), None)
 
 
 @router.post("/", response_model=schemas.Chemical)
