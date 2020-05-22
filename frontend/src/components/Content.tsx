@@ -1,5 +1,5 @@
 import React from 'react';
-import {Route, Switch} from "react-router-dom";
+import {Redirect, Route, Switch} from "react-router-dom";
 import {Theme} from "@material-ui/core";
 import {makeStyles} from "@material-ui/styles";
 import Home from './Home';
@@ -22,15 +22,16 @@ function Content () {
 	return (
 		<div className={classes.content}>
 			<Switch>
-			    <Route exact path={["/", "/login"]}>
+			    <Route exact path="/login">
                     <Login/>
                 </Route>
 				<Route exact path="/register">
 					<Register/>
 				</Route>
-				<Route exact path="/home">
+				<Route path="/home/:token">
 					<Home/>
 				</Route>
+				<Route path="/" render={() => (<Redirect to="/login" />)} />
 			</Switch>
 		</div>
 	);
