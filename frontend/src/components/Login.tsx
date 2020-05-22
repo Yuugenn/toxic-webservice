@@ -2,11 +2,14 @@ import {makeStyles, Theme} from "@material-ui/core";
 import {Button, CircularProgress, Link, Paper, TextField} from "@material-ui/core";
 import React, {useState} from "react";
 import {useHistory} from "react-router-dom";
-import {API_URL} from "../config";
+import {BACKEND_URL} from "../config";
 
 
 const useStyles = makeStyles((theme:Theme) => ({
 
+    circularProgress: {
+        margin: "auto"
+    },
     form: {
         display: "flex",
         flexDirection: "column"
@@ -33,10 +36,32 @@ function Login() {
     const history = useHistory();
     const classes = useStyles();
 
-    const [email,     setEmail   ] = useState<string>( "" );
-    const [password,  setPassword] = useState<string>( "" );
-    const [error,     setError   ] = useState<string>( "" );
-    const [isLoading, setLoading ] = useState<boolean>( false );
+    const [email,         setEmail        ] = useState<string>( "" );
+    const [emailError,    setEmailError   ] = useState<boolean>( false );
+    const [password,      setPassword     ] = useState<string>( "" );
+    const [passwordError, setPasswordError] = useState<boolean>( false );
+    const [loginError,    setLoginError   ] = useState<string>( "" );
+    const [isLoading,     setLoading      ] = useState<boolean>( false );
+
+
+    const isFormCorrect = () => {
+
+        let isCorrect:boolean = true;
+
+        if( email == "" ) {
+            setEmailError( true );
+            isCorrect = false;
+        } else
+            setEmailError( false );
+
+        if( password == "" ) {
+            setPasswordError( true );
+            isCorrect = false;
+        } else
+            setPasswordError( false );
+
+        return isCorrect;
+    }
 
 
 	const login = async (event:any) => {
@@ -44,7 +69,10 @@ function Login() {
         // prevent reload of the site (form submit)
         event.preventDefault();
 
-        setError( "" );
+        if( ! isFormCorrect() )
+            return;
+
+        setLoginError( "" );
         setLoading( true );
 
         const body = {
@@ -52,42 +80,37 @@ function Login() {
             "password": password
         };
 
-        // TODO: change on completed backend
+        const response = await fetch( BACKEND_URL + "/login", { method: "POST", body: JSON.stringify(body) } );
 
-        // const response = await fetch( API_URL + "login", { method: "POST", body: JSON.stringify(body) } );
-
-        // const data = await response.json();
-
-        // if( data.key !== undefined ) {
-
-        if( email == "test@example.com" && password == "123456" ) {
-            history.push( "/home" );
-        } else {
+        if( response.status == 401 ) {
             setLoading( false );
-            setError( "Falsche E-Mail oder Passwort!" );
+            setLoginError( "E-Mail oder Passwort falsch!" );
+        } else {
+            const data = await response.json();
+            history.push( `/home/${data.token}` );
         }
     };
 
 
     return (
         <Paper className="paper">
+            {isLoading ? <CircularProgress className={classes.circularProgress} /> :
             <form className={classes.form} onSubmit={login}>
                 <div className={classes.label}>
                     <span>E-Mail</span>
                     <Link href="/register">Registrieren</Link>
                 </div>
-                <TextField variant="outlined" className={classes.textField} value={email} onChange={(e) => setEmail(e.target.value)} />
+                <TextField variant="outlined" className={classes.textField} value={email} onChange={(e) => setEmail(e.target.value)} error={emailError} />
                 <div className={classes.label}>
                     <span>Passwort</span>
-                    <Link href="/forget-password">Passwort vergessen</Link>
                 </div>
-                <TextField variant="outlined" className={classes.textField} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                {error && (<p className={classes.error}>{error}</p>)}
+                <TextField variant="outlined" className={classes.textField} type="password" value={password} onChange={(e) => setPassword(e.target.value)} error={passwordError} />
+                {loginError && (<p className={classes.error}>{loginError}</p>)}
                 <div>
                     <Button variant="contained" color="primary" type="submit">Anmelden</Button>
                     {isLoading && (<CircularProgress />)}
                 </div>
-            </form>
+            </form>}
         </Paper>
     );
 }
