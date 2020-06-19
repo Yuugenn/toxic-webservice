@@ -4,9 +4,7 @@ from starlette.requests import Request
 
 from app.core import config
 from app.db.session import SessionLocal
-from .api.api_v1.api import api_router
-
-from .api.api_v1.endpoints import chemicals
+from app.api.api_v1.api import api_router
 
 app = FastAPI(
     title=config.PROJECT_NAME,

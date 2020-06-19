@@ -10,9 +10,8 @@ RUN apt update && \
 COPY environment.yml .
 RUN conda env create -f environment.yml
 
-SHELL ["conda", "run", "-n", "myenv", "/bin/bash", "-c"]
-RUN echo "WOW"
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+SHELL ["conda", "run", "-n", "toxenv", "/bin/bash", "-c"]
 
 COPY . .
-ENTRYPOINT ["conda", "run", "-n", "myenv", "/bin/bash", "-c"]
+
+ENTRYPOINT ["conda", "run", "-n", "toxenv"]
