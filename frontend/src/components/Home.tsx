@@ -158,7 +158,7 @@ function Home() {
         <Paper className="paper">
 		    <div className={classes.row}>
 		        <Autocomplete freeSolo options={chemicals} className={classes.textField} onChange={(e:any, value:any) => { if(value != null) handleOnInputChange(value.smiles); }} getOptionLabel={(option:any) => option.smiles} renderInput={(params) => <TextField {...params} placeholder="SMILES" variant="outlined" onChange={(e:any) => handleOnInputChange(e. target.value)} />} />
-		        <Button variant="contained" color="primary" className={classes.button} onClick={showLastCalculation}><SvgIcon>{KeyboardArrowDownIcon}</SvgIcon></Button>
+                {/*<Button variant="contained" color="primary" className={classes.button} onClick={showLastCalculation}><SvgIcon>{KeyboardArrowDownIcon}</SvgIcon></Button>*/}
 		        <Button variant="contained" color="primary" className={classes.button} onClick={calculate}><SvgIcon>{SearchIcon}</SvgIcon></Button>
 		    </div>
             {showInfos &&
