@@ -38,7 +38,7 @@ function Register() {
     const [firstNameError,          setFirstNameError         ] = useState<boolean>( false );
     const [lastName,                setLastName               ] = useState<string>( "" );
     const [lastNameError,           setLastNameError          ] = useState<boolean>( false );
-    const [organisation,            setOrganisation           ] = useState<string>( "" );
+    const [organization,            setOrganization           ] = useState<string>( "" );
     const [email,                   setEmail                  ] = useState<string>( "" );
     const [emailError,              setEmailError             ] = useState<boolean>( false )
     const [password,                setPassword               ] = useState<string>( "" );
@@ -107,7 +107,7 @@ function Register() {
         const body = {
             "firstName": firstName,
             "lastName": lastName,
-            "organisation": organisation,
+            "organization": organization,
             "email": email,
             "password": password
         };
@@ -124,21 +124,21 @@ function Register() {
         <Paper className="paper">
             {isLoading ? <CircularProgress className={classes.circularProgress} /> :
             <form className={classes.form} onSubmit={register}>
-                <span className={classes.label}>Vorname *</span>
+                <span className={classes.label}>First Name *</span>
                 <TextField variant="outlined" className={classes.textField} value={firstName} onChange={(e) => setFirstName(e.target.value)} error={firstNameError} />
-                <span className={classes.label}>Nachname *</span>
+                <span className={classes.label}>Last Name *</span>
                 <TextField variant="outlined" className={classes.textField} value={lastName} onChange={(e) => setLastName(e.target.value)} error={lastNameError} />
-                <span className={classes.label}>Organisation</span>
-                <TextField variant="outlined" className={classes.textField} value={organisation} onChange={(e) => setOrganisation(e.target.value)} />
+                <span className={classes.label}>Organization</span>
+                <TextField variant="outlined" className={classes.textField} value={organization} onChange={(e) => setOrganization(e.target.value)} />
                 <span className={classes.label}>E-Mail *</span>
                 <TextField variant="outlined" className={classes.textField} value={email} onChange={(e) => setEmail(e.target.value)} error={emailError} />
-                <span className={classes.label}>Passwort *</span>
+                <span className={classes.label}>Password *</span>
                 <TextField variant="outlined" className={classes.textField} type="password" value={password} onChange={(e) => setPassword(e.target.value)} error={passwordError} />
-                <span className={classes.label}>Passwort wiederholen *</span>
+                <span className={classes.label}>Repeat Password *</span>
                 <TextField variant="outlined" className={classes.textField} type="password" value={passwordRepetition} onChange={(e) => setPasswordRepetition(e.target.value)} error={passwordRepetitionError} />
                 {registerError && (<p className={classes.error}>{registerError}</p>)}
                 <div>
-                    <Button variant="contained" color="primary" type="submit">Registrieren</Button>
+                    <Button variant="contained" color="primary" type="submit">Register</Button>
                     {isLoading && (<CircularProgress />)}
                 </div>
             </form>}

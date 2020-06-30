@@ -98,16 +98,16 @@ function Login() {
             <form className={classes.form} onSubmit={login}>
                 <div className={classes.label}>
                     <span>E-Mail</span>
-                    <Link href="/register">Registrieren</Link>
+                    <Link href="/register">Register</Link>
                 </div>
                 <TextField variant="outlined" className={classes.textField} value={email} onChange={(e) => setEmail(e.target.value)} error={emailError} />
                 <div className={classes.label}>
-                    <span>Passwort</span>
+                    <span>Password</span>
                 </div>
                 <TextField variant="outlined" className={classes.textField} type="password" value={password} onChange={(e) => setPassword(e.target.value)} error={passwordError} />
                 {loginError && (<p className={classes.error}>{loginError}</p>)}
                 <div>
-                    <Button variant="contained" color="primary" type="submit">Anmelden</Button>
+                    <Button variant="contained" color="primary" type="submit">Login</Button>
                     {isLoading && (<CircularProgress />)}
                 </div>
             </form>}

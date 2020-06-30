@@ -163,10 +163,10 @@ function Home() {
 		    </div>
             {showInfos &&
             <div>
-                <Typography variant="h6" className={classes.heading}>Struktur</Typography>
+                <Typography variant="h6" className={classes.heading}>Structure</Typography>
                 <canvas id="smiles-drawer" />
 
-                <Typography variant="h6" className={classes.heading}>Identifizierer und Eigenschaften</Typography>
+                <Typography variant="h6" className={classes.heading}>Properties</Typography>
                 {chemicalInfoIsLoading && <CircularProgress />}
                 {!chemicalInfoIsLoading &&
                     <Table className={classes.table}>
@@ -176,11 +176,11 @@ function Home() {
                                 <TableCell className={classes.trRight}>{chemicalInfo.IUPACName}</TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell className={classes.trLeft}>Chemische Formel</TableCell>
+                                <TableCell className={classes.trLeft}>Molecular Formula</TableCell>
                                 <TableCell className={classes.trRight}>{chemicalInfo.MolecularFormula}</TableCell>
                             </TableRow>
                             <TableRow>
-                                <TableCell className={classes.trLeft}>Molekülmasse</TableCell>
+                                <TableCell className={classes.trLeft}>Molecular Weight</TableCell>
                                 <TableCell className={classes.trRight}>{chemicalInfo.MolecularWeight} g/mol</TableCell>
                             </TableRow>
                             <TableRow>
@@ -194,7 +194,7 @@ function Home() {
                         </TableBody>
                     </Table>}
 
-                <Typography variant="h6" className={classes.heading}>Ergebnis</Typography>
+                <Typography variant="h6" className={classes.heading}>Result</Typography>
                 {resultIsLoading && <CircularProgress />}
                 {!resultIsLoading && <span>{result}</span>}
             </div>
