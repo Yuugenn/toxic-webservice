@@ -1,56 +1,64 @@
-import {AppBar, makeStyles, Theme, Toolbar, Typography, Button} from '@material-ui/core';
+import {AppBar, IconButton, makeStyles, Theme, Toolbar, Typography} from '@material-ui/core';
 import React from 'react';
-import {useHistory} from 'react-router-dom';
+import {matchPath} from 'react-router';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import WarningIcon from '@material-ui/icons/Warning';
-import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+
 
 const useStyles = makeStyles((theme: Theme) => ({
-	root: {
-		flexGrow: 1,
+
+	toolbar: {
+		display: 'flex',
+		justifyContent: 'space-between'
 	},
-	title: {
-		color: 'inherit',
-		textTransform: 'none',
-	},
-	button: {
-		color: 'inherit',
+	brand: {
+		display: 'flex',
+		alignItems: 'center'
 	},
 	logo: {
-		marginRight: theme.spacing(2),
+		marginRight: theme.spacing(2)
 	},
+	iconButton: {
+		color: 'white'
+	}
 }));
 
-function NavigationBar() {
-	const classes = useStyles();
-	const history = useHistory();
 
-	function handleLogoClick(): void {
-		history.push('/');
+function NavigationBar() {
+
+	const classes = useStyles();
+
+
+	const logout = () => {
+
+		// token must be parse manually from url, because useParams is not working
+
+		let url:string = window.location.href;
+
+		let token = url.match( /([^\/]+$)/g );
+
+		// TODO: logout
+
+		// if( token )
+			// token[0]
 	}
-	function handleUploadClick(): void {
-		history.push('/upload');
-	}
+
 
 	return (
-		<div className={classes.root}>
-			<AppBar
-				position="sticky"
-				color="primary"
-			>
-				<Toolbar>
-					<Button className={classes.title} disableRipple onClick={handleLogoClick}>
-						<WarningIcon className={classes.logo}/>
-						<Typography variant="h6">
-							Toxic Webapp
-						</Typography>
-					</Button>
-					<Button className={classes.button} onClick={handleUploadClick}>
-						<CloudUploadIcon/>
-					</Button>
-				</Toolbar>
-			</AppBar>
-		</div>
+        <AppBar position="sticky" color="primary">
+            <Toolbar className={classes.toolbar}>
+				<div className={classes.brand}>
+                	<WarningIcon className={classes.logo} />
+                	<Typography variant="h6">Toxic Webapp</Typography>
+				</div>
+				{matchPath(window.location.pathname, {
+					path: '/home/:token',
+					exact: true
+				}) ? <IconButton className={classes.iconButton} onClick={logout}><ExitToAppIcon /></IconButton> : ""}
+            </Toolbar>
+        </AppBar>
 	);
 }
+
 
 export default NavigationBar;

@@ -5,6 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^4.9.10",
     "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.53",
     "@material-ui/styles": "^4.9.10",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/user-event": "^7.2.1",
@@ -21,6 +22,7 @@
     "react-scripts": "3.4.0",
     "react-truncate": "^2.4.0",
     "redux": "^4.0.5",
+    "smiles-drawer": "^1.2.0",
     "standard": "^14.3.3",
     "superagent": "^5.2.1",
     "typescript": "^3.7.5"
@@ -48,8 +50,8 @@
   },
   "devDependencies": {
     "@testing-library/react": "^9.5.0",
-    "@typescript-eslint/eslint-plugin": "^2.24.0",
-    "@typescript-eslint/parser": "^2.24.0",
+    "@typescript-eslint/eslint-plugin": "^2.30.0",
+    "@typescript-eslint/parser": "^2.30.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-config-react-app": "^5.2.1",
     "eslint-plugin-flowtype": "^4.6.0",

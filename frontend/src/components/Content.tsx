@@ -1,31 +1,41 @@
 import React from 'react';
-import {Route, Switch} from "react-router-dom";
+import {Redirect, Route, Switch} from "react-router-dom";
 import {Theme} from "@material-ui/core";
 import {makeStyles} from "@material-ui/styles";
 import Home from './Home';
+import Login from './Login';
+import Register from './Register';
 
 
 const useStyles = makeStyles((theme: Theme) => ({
+
 	content: {
 		height: '100%'
 	}
 }));
 
+
 function Content () {
+
 	const classes = useStyles();
 
 	return (
 		<div className={classes.content}>
 			<Switch>
-				<Route path="/upload">
-					Upload
+			    <Route exact path="/login">
+                    <Login/>
+                </Route>
+				<Route exact path="/register">
+					<Register/>
 				</Route>
-				<Route path="/">
+				<Route path="/home/:token">
 					<Home/>
 				</Route>
+				<Route path="/" render={() => (<Redirect to="/login" />)} />
 			</Switch>
 		</div>
 	);
 }
+
 
 export default Content;
