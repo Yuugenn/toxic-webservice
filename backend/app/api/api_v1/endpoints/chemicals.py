@@ -1,9 +1,12 @@
-from typing import List
-
-from fastapi import APIRouter
-
 from app import schemas
 from app.schemas.chemicals import ChemicalCreate, Chemical
+from fastapi import APIRouter
+from joblib import dump, load
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from typing import List
+
+import numpy as np
 
 router = APIRouter()
 
@@ -40,6 +43,17 @@ async def get_chemical(
         smiles: str
 ):
     return next((x for x in chemicals if x.smiles == smiles), None)
+
+
+@router.post("/smiles/{smiles}")
+async def get_chemical(
+        smiles: str
+):
+    mol = Chem.MolFromSmiles( smiles )
+    bitVect = AllChem.GetMorganFingerprintAsBitVect( mol, 2, nBits=1024 )
+    model = load('model.joblib')
+    predicted = model.predict([ np.asarray(bitVect) ])
+    return predicted[0]
 
 
 @router.post("/", response_model=schemas.Chemical)
