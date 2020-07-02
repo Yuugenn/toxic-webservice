@@ -145,12 +145,15 @@ function Home() {
 
         setResultIsLoading( true );
 
-        // TODO: implement
-        // const response = await fetch( BACKEND_URL + "/chemicals/" + input, { method: "POST" });
-        // const json = await response.json();
+        const response = await fetch( BACKEND_URL + "/chemicals/smiles/" + input, { method: "POST" });
+        const result = await response.text();
 
         setResultIsLoading( false );
-        setResult( "ANTWORT VOM SERVER" );
+
+        if( result == '"0"' )
+            setResult( "Ist nicht giftig" );
+        else if( result == '"1"' )
+            setResult( "Ist giftig" );
     }
 
 
