@@ -20,4 +20,3 @@ dependencies:
   - rdkit=2020.03.3
   - joblib=0.14.1
   - scikit-learn=0.23.1
-#  - requests=2.23.0
