@@ -1,4 +1,5 @@
 from app import schemas
+from app.prediction.prediction_engine import predict_knn
 from app.schemas.chemicals import ChemicalCreate, Chemical
 from fastapi import APIRouter
 from joblib import dump, load
@@ -49,11 +50,7 @@ async def get_chemical(
 async def get_chemical(
         smiles: str
 ):
-    mol = Chem.MolFromSmiles( smiles )
-    bitVect = AllChem.GetMorganFingerprintAsBitVect( mol, 2, nBits=1024 )
-    model = load('model.joblib')
-    predicted = model.predict([ np.asarray(bitVect) ])
-    return predicted[0]
+    return predict_knn(smiles)
 
 
 @router.post("/", response_model=schemas.Chemical)
