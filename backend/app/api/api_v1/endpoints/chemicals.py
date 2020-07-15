@@ -1,15 +1,12 @@
-import traceback
-
 from pydantic.main import BaseModel
 from sqlalchemy.orm import Session
-from starlette import status
 
 from app import schemas
-from app.db import chemical_crud, crud
+from app.db import chemical_crud
 from app.db.session import get_db
 from app.prediction.prediction_engine import predict_knn
 from app.schemas.chemicals import ChemicalCreate, Chemical
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query
 
 from typing import List
 
@@ -70,14 +67,7 @@ async def predict_chemical_toxicity(
     label = predict_knn(smiles)
 
     chem = ChemicalCreate(smiles=smiles, predicted=True, label=label)
-
-    try:
-        chem_db = chemical_crud.create_chemical(db, chem)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=traceback.format_exc()
-        )
+    chem_db = chemical_crud.create_chemical(db, chem)
 
     return PredictionAnswer(chemical=chem_db, new=True)
 
