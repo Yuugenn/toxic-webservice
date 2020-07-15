@@ -1,3 +1,5 @@
+import traceback
+
 from pydantic.main import BaseModel
 from sqlalchemy.orm import Session
 from starlette import status
@@ -74,9 +76,8 @@ async def predict_chemical_toxicity(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='DB Error'
+            detail=traceback.format_exc()
         )
-
 
     return PredictionAnswer(chemical=chem_db, new=True)
 
