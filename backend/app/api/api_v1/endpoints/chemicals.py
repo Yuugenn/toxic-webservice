@@ -44,7 +44,7 @@ async def get_chemicals_by_smiles(
     smiles: str,
     db: Session = Depends(get_db)
 ):
-    chemicals = chemical_crud.get_chemical_by_smiles(db, smiles)
+    chemicals = chemical_crud.get_all_chemicals_by_smiles(db, smiles)
 
     return chemicals
 
