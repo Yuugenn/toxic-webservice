@@ -18,7 +18,7 @@ def predict_knn(smiles: str):
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=traceback.format_exc()
+            detail='Error during toxicity prediction. The smiles code was probably invalid'
         )
 
     return predicted[0]
