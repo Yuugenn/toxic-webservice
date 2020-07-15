@@ -1,61 +1,80 @@
+from pydantic.main import BaseModel
+from sqlalchemy.orm import Session
+
 from app import schemas
+from app.db import chemical_crud, crud
+from app.db.session import get_db
 from app.prediction.prediction_engine import predict_knn
 from app.schemas.chemicals import ChemicalCreate, Chemical
-from fastapi import APIRouter
-from joblib import dump, load
-from rdkit import Chem
-from rdkit.Chem import AllChem
-from typing import List
+from fastapi import APIRouter, Depends, Query
 
-import numpy as np
+from typing import List
 
 router = APIRouter()
 
 # in-memory while waiting for DB
-chem1 = Chemical(id=1, owner_id=1, code="NCGC00091441-01", smiles="[H][C@]12CC[C@H](C)CN1[C@@]3([H])C[C@@]4([H])[C@]5([H])CC=C6CC(CC[C@]6(C)[C@@]5([H])CC[C@]4(C)[C@@]3([H])[C@@H]2C)O[C@@H]7O[C@H](CO)[C@H](O)[C@H](O[C@@H]8O[C@H](CO)[C@@H](O)[C@H](O)[C@H]8O)[C@H]7O[C@H]9O[C@@H](C)[C@H](O)[C@@H](O)[C@H]9O", label=False)
-chem2 = Chemical(id=2, owner_id=1, code="NCGC00181104-01", smiles="[I-].CCN1C(SC2=C1C=CC=C2)=CC=CC=CC3=[N+](CC)C4=C(S3)C=CC=C4", label=False)
-chem3 = Chemical(id=3, owner_id=1, code="NCGC00018301-02", smiles="CCCCCCCCNC(C)C(O)C1=CC=C(SC(C)C)C=C1", label=False)
-chem4 = Chemical(id=4, owner_id=1, code="NCGC00091112-02", smiles="[Cl-].CN(C)C1=CC=C(C=C1)C(C2=CC=C(C=C2)N(C)C)=C3C=CC(C=C3)=[N+](C)C", label=True)
-
-chemicals = [chem1, chem2, chem3, chem4]
+# chem1 = Chemical(id=1, code="NCGC00091441-01", smiles="[H][C@]12CC[C@H](C)CN1[C@@]3([H])C[C@@]4([H])[C@]5([H])CC=C6CC(CC[C@]6(C)[C@@]5([H])CC[C@]4(C)[C@@]3([H])[C@@H]2C)O[C@@H]7O[C@H](CO)[C@H](O)[C@H](O[C@@H]8O[C@H](CO)[C@@H](O)[C@H](O)[C@H]8O)[C@H]7O[C@H]9O[C@@H](C)[C@H](O)[C@@H](O)[C@H]9O", label=0)
+# chem2 = Chemical(id=2, code="NCGC00181104-01", smiles="[I-].CCN1C(SC2=C1C=CC=C2)=CC=CC=CC3=[N+](CC)C4=C(S3)C=CC=C4", label=0)
+# chem3 = Chemical(id=3, code="NCGC00018301-02", smiles="CCCCCCCCNC(C)C(O)C1=CC=C(SC(C)C)C=C1", label=0)
+# chem4 = Chemical(id=4, code="NCGC00091112-02", smiles="[Cl-].CN(C)C1=CC=C(C=C1)C(C2=CC=C(C=C2)N(C)C)=C3C=CC(C=C3)=[N+](C)C", label=1)
+#
+# chemicals = [chem1, chem2, chem3, chem4]
 
 
 @router.get("/", response_model=List[schemas.Chemical])
-async def get_chemical():
-    return chemicals
-
-
-@router.get("/{chem_id}", response_model=schemas.Chemical)
-async def get_chemical(
-        chem_id: int
+async def get_chemicals(
+    db: Session = Depends(get_db),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=100)
 ):
-    return next((x for x in chemicals if x.id == chem_id), None)
+
+    return chemical_crud.get_chemicals(db, skip, limit)
 
 
 @router.get("/codes/{code}", response_model=schemas.Chemical)
-async def get_chemical(
-        code: str
+async def get_chemical_by_code(
+        code: str,
+        db: Session = Depends(get_db)
 ):
-    return next((x for x in chemicals if x.code == code), None)
+    return chemical_crud.get_chemical_by_code(db, code)
 
 
-@router.get("/smiles/{smiles}", response_model=schemas.Chemical)
-async def get_chemical(
-        smiles: str
+@router.get("/smiles/{smiles}", response_model=List[schemas.Chemical])
+async def get_chemicals_by_smiles(
+    smiles: str,
+    db: Session = Depends(get_db)
 ):
-    return next((x for x in chemicals if x.smiles == smiles), None)
+    chemicals = chemical_crud.get_chemical_by_smiles(db, smiles)
+
+    return chemicals
 
 
-@router.post("/smiles/{smiles}")
-async def get_chemical(
-        smiles: str
+class PredictionAnswer(BaseModel):
+    chemical: Chemical
+    new: bool
+
+
+@router.post("/smiles/{smiles}", response_model=PredictionAnswer)
+async def predict_chemical_toxicity(
+    smiles: str,
+    db: Session = Depends(get_db)
 ):
-    return predict_knn(smiles)
+    chemical = chemical_crud.get_chemical_by_smiles(db, smiles)
+
+    if chemical is not None:
+        return PredictionAnswer(chemical=chemical, new=False)
+
+    label = predict_knn(smiles)
+
+    chem = ChemicalCreate(smiles=smiles, predicted=True, label=label)
+    chem_db = chemical_crud.create_chemical(db, chem)
+
+    return PredictionAnswer(chemical=chem_db, new=True)
 
 
-@router.post("/", response_model=schemas.Chemical)
-async def submit_chemical(chem_input: ChemicalCreate):
-    # id and owner_id are temporary while waiting for db
-    chem = Chemical(id=1, owner_id=1, code=chem_input.code, smiles=chem_input.smiles, label=False)
-    chemicals.append(chem)
-    return chem
+# @router.post("/", response_model=schemas.Chemical)
+# async def submit_chemical(chem_input: ChemicalCreate):
+#     # id and owner_id are temporary while waiting for db
+#     chem = Chemical(id=1, owner_id=1, code=chem_input.code, smiles=chem_input.smiles, label=False)
+#     chemicals.append(chem)
+#     return chem

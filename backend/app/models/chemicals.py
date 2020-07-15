@@ -3,13 +3,13 @@ from sqlalchemy import Boolean, Column, Integer, String
 from app.db.session import Base
 
 
-class Chemicals(Base):
-    __tablename__ = "ToxTable"
+class Chemical(Base):
+    __tablename__ = "chemicals"
 
     id = Column(Integer, primary_key=True, index=True)
     smiles = Column(String)
-    code = Column(String, unique=True, index=True)
+    code = Column(String, unique=True)
     label = Column(Integer)
-    owner_id = Column(Integer)
+    predicted = Column(Boolean)
 
 
