@@ -1,70 +1,26 @@
-import requests
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm, HTTPBasic, HTTPBasicCredentials
-from pydantic import BaseModel
-from starlette import status
+from fastapi import APIRouter, Depends
+from fastapi.security import OAuth2PasswordRequestForm
+from app.api.user_management import active_users, User, get_current_user, user_login
 
 router = APIRouter()
 
-security = HTTPBasic()
 
-endpoint = "https://api.fiw.fhws.de/auth/api/users/me"
-# data = {"ip": "1.1.2.3"}
-# headers = {"Authorization": "Bearer MYREALLYLONGTOKENIGOT"}
-
-
-class AuthResponse(BaseModel):
-    email: str
-    fhws_token: str
-
-
-@router.get("/", response_model=AuthResponse)
+@router.post("")
 async def login(
-        login_encoded: str
+        form_data: OAuth2PasswordRequestForm = Depends()
 ):
+    login_data = form_data.username + ':' + form_data.password
 
-    headers = {"Authorization": "Basic " + login_encoded}
+    token = user_login(login_data)
 
-    response = send_auth_request(headers)
-
-    status_code = response.status_code
-
-    if not (status_code == 200):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-        )
-
-    return create_auth_response(response)
+    return {"access_token": token, "token_type": "bearer"}
 
 
-@router.get("/token", response_model=AuthResponse)
-async def login(
-        token: str
-):
-    headers = {"Authorization": "Bearer " + token}
-
-    response = send_auth_request(headers)
-
-    status_code = response.status_code
-
-    if not (status_code == 200):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
-
-    return create_auth_response(response)
+@router.get("/users/me")
+async def read_users_me(current_user: User = Depends(get_current_user)):
+    return {"email": current_user.email, "access_token": current_user.current_token, "token_type": "bearer"}
 
 
-def send_auth_request(header):
-    return requests.get(endpoint, headers=header)
-
-
-def create_auth_response(response: requests.Response):
-    token = response.headers.get("X-fhws-jwt-token")
-
-    json = response.json()
-    user_email = json["emailAddress"]
-
-    return AuthResponse(email=user_email, fhws_token=token)
+@router.get("/users/all")
+async def read_users_me():
+    return active_users
