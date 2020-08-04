@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
-from app.api.user_management import active_users, User, get_current_user, user_login
+from app.api.user_management import active_users, User, get_current_user, user_login, refresh_login
 
 router = APIRouter()
 
@@ -13,7 +13,13 @@ async def login(
 
     token = user_login(login_data)
 
-    return {"access_token": token, "token_type": "bearer"}
+    return {"access_token": token, "token_type": "bearer", "expires-in": "30m"}
+
+
+@router.get("/refresh")
+async def read_users_me(current_user: User = Depends(get_current_user)):
+    token = refresh_login(current_user)
+    return {"access_token": token, "token_type": "bearer", "expires-in": "30m"}
 
 
 @router.get("/users/me")

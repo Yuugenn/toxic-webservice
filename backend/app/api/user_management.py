@@ -27,14 +27,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-    headers = {"Authorization": "Bearer " + token}
-
-    response = authorize_with_fhws(headers, "Invalid token")
-
-    token = response.headers.get("X-fhws-jwt-token")
-    user.current_token = token
-
     return user
 
 
@@ -62,6 +54,16 @@ def add_user(email: str, token: str, role: str):
         active_users.append(User(email=email, current_token=token, role=role))
     else:
         user.current_token = token
+
+
+def refresh_login(user: User):
+    headers = {"Authorization": "Bearer " + user.current_token}
+
+    response = authorize_with_fhws(headers, "Invalid token")
+
+    token = response.headers.get("X-fhws-jwt-token")
+    user.current_token = token
+    return token
 
 
 def authorize_with_fhws(headers, detail):
