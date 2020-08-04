@@ -6,23 +6,25 @@ from pydantic.main import BaseModel
 # Shared properties
 class ChemicalBase(BaseModel):
     code: Optional[str] = None
-    smiles: Optional[str] = None
-    label: Optional[bool] = None
+    smiles: str
+    label: int
+    predicted: bool
 
 
 # Properties to receive on item creation
 class ChemicalCreate(ChemicalBase):
-    code: str
     smiles: str
+    label: int
+    predicted: bool
 
 
 # Properties shared by models stored in DB
 class ChemicalInDBBase(ChemicalBase):
     id: int
-    code: str
+    code: Optional[str] = None
     smiles: str
-    label: bool
-    owner_id: int
+    label: int
+    predicted: bool
 
     class Config:
         orm_mode = True

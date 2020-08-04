@@ -1,1 +1,1 @@
-from .chemicals import ChemicalCreate, Chemical, ChemicalInDB
+from .chemicals import ChemicalCreate, Chemical

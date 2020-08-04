@@ -1,1 +1,1 @@
-from .chemicals import Chemicals
+from .chemicals import Chemical
