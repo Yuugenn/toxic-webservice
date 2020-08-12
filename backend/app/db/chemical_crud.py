@@ -38,3 +38,12 @@ def create_chemical(db: Session, chemical: ChemicalCreate):
     db.commit()
     db.refresh(db_chemical)
     return db_chemical
+
+
+def update_chemical(db: Session, smiles: str, label: int):
+    get_by_smiles_query(db, smiles).update({Chemical.label: label, Chemical.predicted: False})
+    db.commit()
+
+
+
+

@@ -24,7 +24,7 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
 
 @router.get("/users/me")
 async def read_users_me(current_user: User = Depends(get_current_user)):
-    return {"email": current_user.email, "access_token": current_user.current_token, "token_type": "bearer"}
+    return {"user": current_user, "access_token": current_user.current_token, "token_type": "bearer"}
 
 
 @router.get("/users/all")

@@ -1,5 +1,6 @@
 from pydantic.main import BaseModel
 from sqlalchemy.orm import Session
+from starlette import status
 
 from app import schemas
 from app.api.user_management import User, get_current_user
@@ -7,7 +8,7 @@ from app.db import chemical_crud
 from app.db.session import get_db
 from app.prediction.prediction_engine import predict_knn
 from app.schemas.chemicals import ChemicalCreate, Chemical
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 
 from typing import List
 
@@ -68,9 +69,21 @@ async def predict_chemical_toxicity(
     return PredictionAnswer(chemical=chem_db, new=True)
 
 
-# @router.post("/", response_model=schemas.Chemical)
-# async def submit_chemical(chem_input: ChemicalCreate):
-#     # id and owner_id are temporary while waiting for db
-#     chem = Chemical(id=1, owner_id=1, code=chem_input.code, smiles=chem_input.smiles, label=False)
-#     chemicals.append(chem)
-#     return chem
+@router.put("/smiles/{smiles}", response_model=PredictionAnswer)
+async def predict_chemical_toxicity(
+        smiles: str,
+        label: int = Query(..., ge=0, le=1),
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+):
+    if current_user.role == "student":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid permissions.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    chemical_crud.update_chemical(db, smiles, label)
+
+    chem_db = chemical_crud.get_chemical_by_smiles(db, smiles)
+    return PredictionAnswer(chemical=chem_db, new=False)
+

@@ -19,8 +19,13 @@ active_users = []
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
-    user = next((x for x in active_users if x.current_token == token), None)
+    headers = {"Authorization": "Bearer " + token}
 
+    response = authorize_with_fhws(headers, "Invalid token")
+    json = response.json()
+
+    user_email = json["emailAddress"]
+    user = next((u for u in active_users if u.email == user_email), None)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -75,5 +80,6 @@ def authorize_with_fhws(headers, detail):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=detail,
+            headers={"WWW-Authenticate": "Bearer"},
         )
     return response
