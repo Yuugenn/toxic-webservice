@@ -4,7 +4,6 @@ import {Theme} from "@material-ui/core";
 import {makeStyles} from "@material-ui/styles";
 import Home from './Home';
 import Login from './Login';
-import Register from './Register';
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -25,9 +24,6 @@ function Content () {
 			    <Route exact path="/login">
                     <Login/>
                 </Route>
-				<Route exact path="/register">
-					<Register/>
-				</Route>
 				<Route path="/home/:token">
 					<Home/>
 				</Route>

@@ -14,10 +14,6 @@ const useStyles = makeStyles((theme:Theme) => ({
         display: "flex",
         flexDirection: "column"
     },
-    label: {
-        display: "flex",
-        justifyContent: "space-between"
-    },
     textField: {
 		flex: "1",
         marginTop: "12px",
@@ -96,14 +92,9 @@ function Login() {
         <Paper className="paper">
             {isLoading ? <CircularProgress className={classes.circularProgress} /> :
             <form className={classes.form} onSubmit={login}>
-                <div className={classes.label}>
-                    <span>E-Mail</span>
-                    <Link href="/register">Register</Link>
-                </div>
+                <span>E-Mail</span>
                 <TextField variant="outlined" className={classes.textField} value={email} onChange={(e) => setEmail(e.target.value)} error={emailError} />
-                <div className={classes.label}>
-                    <span>Password</span>
-                </div>
+                <span>Password</span>
                 <TextField variant="outlined" className={classes.textField} type="password" value={password} onChange={(e) => setPassword(e.target.value)} error={passwordError} />
                 {loginError && (<p className={classes.error}>{loginError}</p>)}
                 <div>
