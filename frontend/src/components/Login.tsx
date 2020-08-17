@@ -1,5 +1,5 @@
 import {makeStyles, Theme} from "@material-ui/core";
-import {Button, CircularProgress, Link, Paper, TextField} from "@material-ui/core";
+import {Button, CircularProgress, Paper, TextField} from "@material-ui/core";
 import React, {useState} from "react";
 import {useHistory} from "react-router-dom";
 import {BACKEND_URL} from "../config";
@@ -32,8 +32,8 @@ function Login() {
     const history = useHistory();
     const classes = useStyles();
 
-    const [email,         setEmail        ] = useState<string>( "" );
-    const [emailError,    setEmailError   ] = useState<boolean>( false );
+    const [kNumber,       setKNumber      ] = useState<string>( "" );
+    const [kNumberError,  setKNumberError ] = useState<boolean>( false );
     const [password,      setPassword     ] = useState<string>( "" );
     const [passwordError, setPasswordError] = useState<boolean>( false );
     const [loginError,    setLoginError   ] = useState<string>( "" );
@@ -44,11 +44,11 @@ function Login() {
 
         let isCorrect:boolean = true;
 
-        if( email == "" ) {
-            setEmailError( true );
+        if( kNumber == "" ) {
+            setKNumberError( true );
             isCorrect = false;
         } else
-            setEmailError( false );
+            setKNumberError( false );
 
         if( password == "" ) {
             setPasswordError( true );
@@ -71,37 +71,48 @@ function Login() {
         setLoginError( "" );
         setLoading( true );
 
-        const body = {
-            "email": email,
-            "password": password
-        };
+        const formData = new FormData();
+              formData.append( "username", kNumber );
+              formData.append( "password", password );
 
-        const response = await fetch( BACKEND_URL + "/login", { method: "POST", body: JSON.stringify(body) } );
+        const response = await fetch( BACKEND_URL + "/login", { method: "POST", body: formData } );
 
         if( response.status == 401 ) {
             setLoading( false );
-            setLoginError( "E-Mail oder Passwort falsch!" );
+            setLoginError( "K-Number or password wrong!" );
         } else {
             const data = await response.json();
-            history.push( `/home/${data.token}` );
+            history.push( `/home/${data.access_token}` );
         }
     };
 
 
+    const handleOnChangeKNumberTextField = (event:any) => {
+
+        setKNumber( event.target.value );
+        setKNumberError( false );
+    }
+
+
+    const handleOnChangePasswordTextField = (event:any) => {
+
+        setPassword( event.target.value );
+        setPasswordError( false );
+    }
+
+
     return (
         <Paper className="paper">
-            {isLoading ? <CircularProgress className={classes.circularProgress} /> :
             <form className={classes.form} onSubmit={login}>
-                <span>E-Mail</span>
-                <TextField variant="outlined" className={classes.textField} value={email} onChange={(e) => setEmail(e.target.value)} error={emailError} />
+                <span>K-Number</span>
+                <TextField variant="outlined" className={classes.textField} value={kNumber} onChange={handleOnChangeKNumberTextField} error={kNumberError} />
                 <span>Password</span>
-                <TextField variant="outlined" className={classes.textField} type="password" value={password} onChange={(e) => setPassword(e.target.value)} error={passwordError} />
+                <TextField variant="outlined" className={classes.textField} type="password" value={password} onChange={handleOnChangePasswordTextField} error={passwordError} />
                 {loginError && (<p className={classes.error}>{loginError}</p>)}
                 <div>
-                    <Button variant="contained" color="primary" type="submit">Login</Button>
-                    {isLoading && (<CircularProgress />)}
+                    {isLoading ? <CircularProgress /> : <Button variant="contained" color="primary" type="submit">Login</Button>}
                 </div>
-            </form>}
+            </form>
         </Paper>
     );
 }
