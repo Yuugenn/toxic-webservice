@@ -2,7 +2,7 @@ import {makeStyles} from '@material-ui/core';
 import {Button, CircularProgress, Paper, SvgIcon, Table, TableBody, TableCell, TableRow, TextField, Typography} from "@material-ui/core";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import React, {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import {BACKEND_URL} from "../config";
 import NavigationBar from "./NavigationBar";
 
@@ -46,10 +46,12 @@ function Home() {
     const KeyboardArrowDownIcon = <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z" />;
     const SearchIcon = <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />;
 
+    const history = useHistory();
     const classes = useStyles();
 
-    const { token } = useParams();
+    const { accessToken } = useParams();
 
+    const [token,                 setToken                ] = useState<string>( "" );
     const [chemicals,             setChemicals            ] = useState( [] );
     const [input,                 setInput                ] = useState<string>( "" );
     const [showInfos,             setShowInfos            ] = useState<boolean>( false );
@@ -61,7 +63,7 @@ function Home() {
 
     useEffect(() => {  // equivalent to componentDidMount
 
-        fetchChemicals();
+        setToken( accessToken );
     }, []);
 
 
@@ -78,14 +80,6 @@ function Home() {
     }, [showInfos]);
 
 
-    const fetchChemicals = async () => {
-
-        const response = await fetch( BACKEND_URL + "/chemicals" );
-
-        setChemicals( await response.json() );
-    }
-
-
     const handleOnInputChange = (value:string) => {
 
         setShowInfos( false );
@@ -94,25 +88,35 @@ function Home() {
 	};
 
 
-    const showLastCalculation = () => {
+    const fetchInfos = async () => {
 
-        // TODO: implement
-    }
-
-
-    const calculate = () => {
+        await checkIfAuthorized();
 
         setShowInfos( true );
 
         fetchChemicalInfos();
-        fetchResult();
+        fetchToxicState();
+    }
+
+
+    const checkIfAuthorized = async () => {
+
+        const headers = new Headers();
+              headers.append( "Authorization", `Bearer ${token}` );
+
+        const response = await fetch( `${BACKEND_URL}/login/refresh`, { headers: headers });
+
+        if( response.status == 401 )
+            history.push( `/login` );
+        else
+            setToken( (await response.json()).access_token )
     }
 
 
     const fetchChemicalInfos = async () => {
 
         // TODO: error handling
-        
+
         setChemicalInfoIsLoading( true );
 
         const response = await fetch( `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/fastidentity/smiles/${input}/JSON` );
@@ -142,19 +146,26 @@ function Home() {
     }
 
 
-    const fetchResult = async () => {
+    const fetchToxicState = async () => {
 
         setResultIsLoading( true );
 
-        const response = await fetch( BACKEND_URL + "/chemicals/smiles/" + input, { method: "POST" });
-        const result = await response.text();
+        const headers = new Headers();
+              headers.append( "Authorization", `Bearer ${token}` );
+
+        const response = await fetch( `${BACKEND_URL}/chemicals/smiles/${input}`, { method: "POST", headers: headers });
+        const result = await response.json();
 
         setResultIsLoading( false );
 
-        if( result == '"0"' )
-            setResult( "Ist nicht giftig" );
-        else if( result == '"1"' )
-            setResult( "Ist giftig" );
+        if( result.chemical == 0 && result.new == false )
+            setResult( "Chemical is known and not toxic!" );
+        else if( result.chemical == 0 && result.new == true )
+            setResult( "Chemical is not known and were predicted as not toxic!" );
+        else if( result.chemical == 1 && result.new == false )
+            setResult( "Chemical is known and toxic!" );
+        else if( result.chemical == 1 && result.new == true )
+            setResult( "Chemical is not known and were predicted as toxic!" );
     }
 
 
@@ -163,8 +174,7 @@ function Home() {
         <Paper className="paper">
 		    <div className={classes.row}>
 		        <Autocomplete freeSolo options={chemicals} className={classes.textField} onChange={(e:any, value:any) => { if(value != null) handleOnInputChange(value.smiles); }} getOptionLabel={(option:any) => option.smiles} renderInput={(params) => <TextField {...params} placeholder="SMILES" variant="outlined" onChange={(e:any) => handleOnInputChange(e. target.value)} />} />
-                {/*<Button variant="contained" color="primary" className={classes.button} onClick={showLastCalculation}><SvgIcon>{KeyboardArrowDownIcon}</SvgIcon></Button>*/}
-		        <Button variant="contained" color="primary" className={classes.button} onClick={calculate}><SvgIcon>{SearchIcon}</SvgIcon></Button>
+		        <Button variant="contained" color="primary" className={classes.button} onClick={fetchInfos}><SvgIcon>{SearchIcon}</SvgIcon></Button>
 		    </div>
             {showInfos &&
             <div>
@@ -172,8 +182,7 @@ function Home() {
                 <canvas id="smiles-drawer" />
 
                 <Typography variant="h6" className={classes.heading}>Properties</Typography>
-                {chemicalInfoIsLoading && <CircularProgress />}
-                {!chemicalInfoIsLoading &&
+                {chemicalInfoIsLoading ? <CircularProgress /> :
                     <Table className={classes.table}>
                         <TableBody>
                             <TableRow>
@@ -200,8 +209,7 @@ function Home() {
                     </Table>}
 
                 <Typography variant="h6" className={classes.heading}>Result</Typography>
-                {resultIsLoading && <CircularProgress />}
-                {!resultIsLoading && <span>{result}</span>}
+                {resultIsLoading ? <CircularProgress /> : <span>{result}</span>}
             </div>
             }
 		</Paper>
