@@ -3,6 +3,7 @@ import {Button, CircularProgress, Paper, TextField} from "@material-ui/core";
 import React, {useState} from "react";
 import {useHistory} from "react-router-dom";
 import {BACKEND_URL} from "../config";
+import NavigationBar from "./NavigationBar";
 
 
 const useStyles = makeStyles((theme:Theme) => ({
@@ -101,7 +102,8 @@ function Login() {
     }
 
 
-    return (
+    return (<>
+        <NavigationBar logout={false} />
         <Paper className="paper">
             <form className={classes.form} onSubmit={login}>
                 <span>K-Number</span>
@@ -114,7 +116,7 @@ function Login() {
                 </div>
             </form>
         </Paper>
-    );
+    </>);
 }
 
 

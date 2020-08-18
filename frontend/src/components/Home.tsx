@@ -4,6 +4,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {BACKEND_URL} from "../config";
+import NavigationBar from "./NavigationBar";
 
 // not working: import SmilesDrawer from "smiles-drawer";
 const SmilesDrawer = require("smiles-drawer");
@@ -157,7 +158,8 @@ function Home() {
     }
 
 
-    return (
+    return (<>
+        <NavigationBar logout={true} />
         <Paper className="paper">
 		    <div className={classes.row}>
 		        <Autocomplete freeSolo options={chemicals} className={classes.textField} onChange={(e:any, value:any) => { if(value != null) handleOnInputChange(value.smiles); }} getOptionLabel={(option:any) => option.smiles} renderInput={(params) => <TextField {...params} placeholder="SMILES" variant="outlined" onChange={(e:any) => handleOnInputChange(e. target.value)} />} />
@@ -203,7 +205,7 @@ function Home() {
             </div>
             }
 		</Paper>
-	);
+	</>);
 }
 
 
