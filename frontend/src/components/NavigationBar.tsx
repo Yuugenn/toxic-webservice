@@ -1,6 +1,6 @@
 import {AppBar, IconButton, makeStyles, Theme, Toolbar, Typography} from '@material-ui/core';
 import React from 'react';
-import {matchPath} from 'react-router';
+import {useHistory} from "react-router-dom";
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import WarningIcon from '@material-ui/icons/Warning';
 
@@ -24,23 +24,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 
-function NavigationBar() {
+function NavigationBar( props:any ) {
 
+	const history = useHistory();
 	const classes = useStyles();
 
 
 	const logout = () => {
 
-		// token must be parse manually from url, because useParams is not working
-
-		let url:string = window.location.href;
-
-		let token = url.match( /([^\/]+$)/g );
-
-		// TODO: logout
-
-		// if( token )
-			// token[0]
+		history.push( `/login` );
 	}
 
 
@@ -51,10 +43,7 @@ function NavigationBar() {
                 	<WarningIcon className={classes.logo} />
                 	<Typography variant="h6">Toxic Webapp</Typography>
 				</div>
-				{matchPath(window.location.pathname, {
-					path: '/home/:token',
-					exact: true
-				}) ? <IconButton className={classes.iconButton} onClick={logout}><ExitToAppIcon /></IconButton> : ""}
+				{props.logout ? <IconButton className={classes.iconButton} onClick={logout}><ExitToAppIcon /></IconButton> : ""}
             </Toolbar>
         </AppBar>
 	);

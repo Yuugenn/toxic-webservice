@@ -1,29 +1,22 @@
 import React from 'react';
+import {Redirect, Route, Switch} from "react-router-dom";
 import '../App.css';
-import {makeStyles} from '@material-ui/styles';
-import {Theme} from '@material-ui/core';
-import Content from './Content';
-import NavigationBar from './NavigationBar';
-
-
-const useStyles = makeStyles((theme: Theme) => ({
-
-	container: {
-		display: 'flex',
-		flexDirection: 'column',
-	}
-}));
+import Login from "./Login";
+import Home from "./Home";
 
 
 function App() {
 
-	const classes = useStyles();
-
 	return (
-		<div className={classes.container}>
-			<NavigationBar />
-			<Content />
-		</div>
+		<Switch>
+			<Route exact path="/login">
+				<Login/>
+			</Route>
+			<Route path="/home/:accessToken">
+				<Home/>
+			</Route>
+			<Route path="/" render={() => (<Redirect to="/login" />)} />
+		</Switch>
 	);
 }
 
