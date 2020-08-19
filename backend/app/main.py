@@ -17,6 +17,7 @@ origins = [
     "https://localhost.tiangolo.com",
     "http://localhost:3000",
     "http://localhost:8080",
+    "http://localhost:8000"
 ]
 
 # Set all CORS enabled origins
