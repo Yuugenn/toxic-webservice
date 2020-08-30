@@ -1,6 +1,6 @@
 import {AppBar, IconButton, makeStyles, Theme, Toolbar, Typography} from '@material-ui/core';
 import React from 'react';
-import {useHistory} from "react-router-dom";
+import {useHistory} from 'react-router-dom';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import WarningIcon from '@material-ui/icons/Warning';
 
@@ -32,7 +32,7 @@ function NavigationBar( props:any ) {
 
 	const logout = () => {
 
-		history.push( `/login` );
+		history.push( '/login' );
 	}
 
 
@@ -41,7 +41,7 @@ function NavigationBar( props:any ) {
             <Toolbar className={classes.toolbar}>
 				<div className={classes.brand}>
                 	<WarningIcon className={classes.logo} />
-                	<Typography variant="h6">Toxic Webapp</Typography>
+                	<Typography variant="h6">Toxic Webservice</Typography>
 				</div>
 				{props.logout ? <IconButton className={classes.iconButton} onClick={logout}><ExitToAppIcon /></IconButton> : ""}
             </Toolbar>

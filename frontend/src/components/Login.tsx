@@ -45,13 +45,13 @@ function Login() {
 
         let isCorrect:boolean = true;
 
-        if( kNumber == "" ) {
+        if( kNumber === "" ) {
             setKNumberError( true );
             isCorrect = false;
         } else
             setKNumberError( false );
 
-        if( password == "" ) {
+        if( password === "" ) {
             setPasswordError( true );
             isCorrect = false;
         } else
@@ -78,7 +78,7 @@ function Login() {
 
         const response = await fetch( BACKEND_URL + "/login", { method: "POST", body: formData } );
 
-        if( response.status == 401 ) {
+        if( response.status === 401 ) {
             setLoading( false );
             setLoginError( "K-Number or password wrong!" );
         } else {
