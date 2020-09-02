@@ -16,10 +16,10 @@ from rdkit.Chem import AllChem
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import KFold, train_test_split
+from sklearn.model_selection import KFold
 from sklearn.naive_bayes import GaussianNB, MultinomialNB, ComplementNB
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC, LinearSVC
+from sklearn.svm import LinearSVC, SVC
 from sklearn.tree import DecisionTreeClassifier
 
 import csv, math, numpy as np
@@ -80,28 +80,6 @@ for chemical in chemicals:
         print( f"Fehler bei {chemical[0]}" )
 
 
-def count( labels ):
-
-    not_toxic = 0
-    toxic = 0
-    
-    for el in labels:
-
-        if el == 0:
-
-            not_toxic = not_toxic + 1
-
-        elif el == 1:
-
-            toxic = toxic + 1
-
-    print( f"Nicht giftig: {not_toxic}" )
-    print( f"Giftig: {toxic}" )
-
-
-count( labels )
-
-
 X = np.array( bitVects )
 y = np.array( labels )
 
@@ -124,6 +102,7 @@ for key in algorithms:
 
     print( value )
 
+    """
     model = value
 
     model.fit( X, y )
@@ -131,21 +110,9 @@ for key in algorithms:
     dump( model, f"{key}.joblib" )
 
     """
-    X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.3 )  # 30% Testdaten
+    scores = []
 
-    model = value
-
-    model.fit( X_train, y_train )
-
-    print( model.score(X_test, y_test) )
-
-    predicted = model.predict( X_test )
-
-    print( confusion_matrix(y_test, predicted) )
-    """
-
-    """
-    kFold = KFold( n_splits=7 )
+    kFold = KFold( n_splits=5 )
 
     for train_index, test_index in kFold.split( X ):
 
@@ -158,7 +125,10 @@ for key in algorithms:
 
         print( model.score(X_test, y_test) )
 
-        predicted = model.predict( X_test )       
+        scores.append( model.score(X_test, y_test) )
+
+        predicted = model.predict( X_test )
 
         print( confusion_matrix(y_test, predicted) )
-    """
+
+    print( np.mean(scores) )
