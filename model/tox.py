@@ -87,9 +87,10 @@ y = np.array( labels )
 algorithms = {
     "SupportVectorClassifier": SVC(),
     "LinearSupportVectorClassifier": LinearSVC(),
-    "KNearestNeighbor": KNeighborsClassifier( n_neighbors=int(math.sqrt(len(y))) ),
+   #"KNearestNeighbor": KNeighborsClassifier( n_neighbors=87 ),  # Wurzel aus 7578
+    "KNearestNeighbor": KNeighborsClassifier( n_neighbors=77 ),  # Wurzel aus 6062 (80%)
     "GaussianNaiveBayes": GaussianNB(),
-    "MultinominalNaiveBayes": MultinomialNB(),
+    "MultinomialNaiveBayes": MultinomialNB(),
     "ComplementNaiveBayes": ComplementNB(),
     "RandomForestClassifier": RandomForestClassifier(),
     "DecisionTreeClassifier": DecisionTreeClassifier()
@@ -102,33 +103,38 @@ for key in algorithms:
 
     print( value )
 
-    """
     model = value
+
+    """
 
     model.fit( X, y )
 
     dump( model, f"{key}.joblib" )
 
     """
-    scores = []
 
-    kFold = KFold( n_splits=5 )
+    scores = []
+    fnr    = []  # false negative rate
+    tpr    = []  # true  positive rate
+
+    kFold = KFold( n_splits=5, shuffle=True )
 
     for train_index, test_index in kFold.split( X ):
 
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
 
-        model = value
-
         model.fit( X_train, y_train )
-
-        print( model.score(X_test, y_test) )
 
         scores.append( model.score(X_test, y_test) )
 
-        predicted = model.predict( X_test )
+        confusionMatrix = confusion_matrix( y_test, model.predict(X_test) )
 
-        print( confusion_matrix(y_test, predicted) )
+        fnr.append( confusionMatrix[1][0] / (confusionMatrix[1][0] + confusionMatrix[1][1]) )  # fn / (fn + tp)
+        tpr.append( confusionMatrix[1][1] / (confusionMatrix[1][1] + confusionMatrix[1][0]) )  # tp / (tp + fn)
+
+        print( confusionMatrix )
 
     print( np.mean(scores) )
+    print( np.mean(fnr)    )
+    print( np.mean(tpr)    )
