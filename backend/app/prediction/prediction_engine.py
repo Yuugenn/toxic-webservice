@@ -17,7 +17,7 @@ class MlModel(Enum):
     GNB = "GNB"
 
 
-def predict_new(smiles: str, model: MlModel):
+def predict_with_model(smiles: str, model: MlModel):
     try:
         mol = Chem.MolFromSmiles(smiles)
         bit_vector = AllChem.GetMorganFingerprintAsBitVect(mol, 2, nBits=1024)

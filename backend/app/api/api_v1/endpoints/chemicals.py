@@ -6,7 +6,7 @@ from app import schemas
 from app.api.user_management import User, get_current_user
 from app.db import chemicals_crud
 from app.db.session import get_db
-from app.prediction.prediction_engine import predict_knn, predict_new, MlModel
+from app.prediction.prediction_engine import predict_with_model, MlModel
 from app.db.chemicals_schema import ChemicalCreate, Chemical
 from fastapi import APIRouter, Depends, Query, HTTPException
 
@@ -62,7 +62,7 @@ async def predict_chemical_toxicity(
     if chemical is not None:
         return PredictionAnswer(chemical=chemical, new=False)
 
-    label = predict_new(smiles, MlModel.CNB)
+    label = predict_with_model(smiles, model)
 
     chem = ChemicalCreate(smiles=smiles, predicted=True, label=label)
     chem_db = chemicals_crud.create_chemical(db, chem)
