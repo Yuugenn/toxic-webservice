@@ -6,7 +6,7 @@ from app import schemas
 from app.api.user_management import User, get_current_user
 from app.db import chemicals_crud
 from app.db.session import get_db
-from app.prediction.prediction_engine import predict_knn
+from app.prediction.prediction_engine import predict_knn, predict_new, MlModel
 from app.db.chemicals_schema import ChemicalCreate, Chemical
 from fastapi import APIRouter, Depends, Query, HTTPException
 
@@ -53,15 +53,16 @@ class PredictionAnswer(BaseModel):
 @router.post("/smiles/{smiles}", response_model=PredictionAnswer)
 async def predict_chemical_toxicity(
         smiles: str,
+        model: MlModel,
         current_user: User = Depends(get_current_user),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
 ):
     chemical = chemicals_crud.get_chemical_by_smiles(db, smiles)
 
     if chemical is not None:
         return PredictionAnswer(chemical=chemical, new=False)
 
-    label = predict_knn(smiles)
+    label = predict_new(smiles, MlModel.CNB)
 
     chem = ChemicalCreate(smiles=smiles, predicted=True, label=label)
     chem_db = chemicals_crud.create_chemical(db, chem)
