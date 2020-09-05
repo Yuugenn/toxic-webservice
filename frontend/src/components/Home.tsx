@@ -42,8 +42,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Home() {
 
-    // KeyboardArrowDownIcon and SearchIcon via material-ui/icons throws errors, so manually with svg path
-    const KeyboardArrowDownIcon = <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z" />;
+    // SearchIcon via material-ui/icons throws errors, so manually with svg path
     const SearchIcon = <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />;
 
     const history = useHistory();
@@ -64,7 +63,7 @@ function Home() {
     useEffect(() => {  // equivalent to componentDidMount
 
         setToken( accessToken );
-    }, []);
+    }, [accessToken]);
 
 
     useEffect(() => {  // equivalent to componentDidUpdate
@@ -77,7 +76,7 @@ function Home() {
         SmilesDrawer.parse(input, function(tree:any) {
             smilesDrawer.draw(tree, "smiles-drawer", "light", false);
         });
-    }, [showInfos]);
+    }, [input, showInfos]);
 
 
     const handleOnInputChange = (value:string) => {
@@ -106,7 +105,7 @@ function Home() {
 
         const response = await fetch( `${BACKEND_URL}/login/refresh`, { headers: headers });
 
-        if( response.status == 401 )
+        if( response.status === 401 )
             history.push( `/login` );
         else
             setToken( (await response.json()).access_token )
@@ -115,11 +114,14 @@ function Home() {
 
     const fetchChemicalInfos = async () => {
 
-        // TODO: error handling
-
         setChemicalInfoIsLoading( true );
 
         const response = await fetch( `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/fastidentity/smiles/${input}/JSON` );
+
+        if( response.status !== 200 ) {
+            setChemicalInfo( "Error!" );
+            setChemicalInfoIsLoading( false );
+        }
 
         const json = await response.json();
 
@@ -140,9 +142,8 @@ function Home() {
                 chemicalInfo.InChIKey = child.value.sval;
         });
 
-        setChemicalInfoIsLoading( false );
-
         setChemicalInfo( chemicalInfo );
+        setChemicalInfoIsLoading( false );
     }
 
 
@@ -158,13 +159,13 @@ function Home() {
 
         setResultIsLoading( false );
 
-        if( result.chemical == 0 && result.new == false )
+        if( result.chemical.label === 0 && result.chemical.predicted === false )
             setResult( "Chemical is known and not toxic!" );
-        else if( result.chemical == 0 && result.new == true )
+        else if( result.chemical.label === 0 && result.chemical.predicted === true )
             setResult( "Chemical is not known and were predicted as not toxic!" );
-        else if( result.chemical == 1 && result.new == false )
+        else if( result.chemical.label === 1 && result.chemical.predicted === false )
             setResult( "Chemical is known and toxic!" );
-        else if( result.chemical == 1 && result.new == true )
+        else if( result.chemical.label === 1 && result.chemical.predicted === true )
             setResult( "Chemical is not known and were predicted as toxic!" );
     }
 
