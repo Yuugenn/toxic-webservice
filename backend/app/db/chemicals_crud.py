@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from ..models import Chemical
-from ..schemas import ChemicalCreate
+from .chemicals_schema import ChemicalCreate
+from .chemicals_model import Chemical
 
 
 def get_chemical(db: Session, chemical_id: int):
