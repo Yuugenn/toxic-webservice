@@ -21,7 +21,7 @@ active_users = []
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     headers = {"Authorization": "Bearer " + token}
 
-    response = authorize_with_fhws(headers, "Invalid token")
+    response = authorize_with_fhws(headers, "Invalid token", {"WWW-Authenticate": "Bearer"})
     json = response.json()
 
     user_email = json["emailAddress"]
@@ -40,7 +40,7 @@ def user_login(login_data: str):
     login_encoded = base64.b64encode(login_data.encode("utf-8"))
     headers = {"Authorization": "Basic " + login_encoded.decode('ascii')}
 
-    response = authorize_with_fhws(headers, "Incorrect email or password")
+    response = authorize_with_fhws(headers, "Incorrect email or password", {"WWW-Authenticate": "Basic"})
     json = response.json()
     token = response.headers.get("X-fhws-jwt-token")
 
@@ -64,14 +64,14 @@ def add_user(email: str, token: str, role: str):
 def refresh_login(user: User):
     headers = {"Authorization": "Bearer " + user.current_token}
 
-    response = authorize_with_fhws(headers, "Invalid token")
+    response = authorize_with_fhws(headers, "Invalid token", {"WWW-Authenticate": "Bearer"})
 
     token = response.headers.get("X-fhws-jwt-token")
     user.current_token = token
     return token
 
 
-def authorize_with_fhws(headers, detail):
+def authorize_with_fhws(headers, detail, exception_headers):
     response = requests.get(endpoint, headers=headers)
 
     status_code = response.status_code
@@ -80,6 +80,6 @@ def authorize_with_fhws(headers, detail):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=detail,
-            headers={"WWW-Authenticate": "Bearer"},
+            headers=exception_headers,
         )
     return response

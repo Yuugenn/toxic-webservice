@@ -78,9 +78,8 @@ async def predict_chemical_toxicity(
 ):
     if current_user.role == "student":
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid permissions.",
-            headers={"WWW-Authenticate": "Bearer"},
         )
     chemical_crud.update_chemical(db, smiles, label)
 

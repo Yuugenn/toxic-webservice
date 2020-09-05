@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from starlette import status
+
 from app.api.user_management import active_users, User, get_current_user, user_login, refresh_login
 
 router = APIRouter()
@@ -28,5 +30,10 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
 
 
 @router.get("/users/all")
-async def read_users_me():
+async def read_users_me(current_user: User = Depends(get_current_user)):
+    if current_user.role == "student":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid permissions.",
+        )
     return active_users
