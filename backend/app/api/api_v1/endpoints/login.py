@@ -19,14 +19,14 @@ async def login(
 
 
 @router.get("/refresh")
-async def read_users_me(current_user: User = Depends(get_current_user)):
-    token = refresh_login(current_user)
+async def read_users_me(current_user: User = Depends(get_current_user),
+                        token: str = Depends(refresh_login)):
     return {"access_token": token, "token_type": "bearer", "expires-in": "30m"}
 
 
 @router.get("/users/me")
 async def read_users_me(current_user: User = Depends(get_current_user)):
-    return {"user": current_user, "access_token": current_user.current_token, "token_type": "bearer"}
+    return {"user": current_user, "token_type": "bearer"}
 
 
 @router.get("/users/all")

@@ -11,7 +11,6 @@ endpoint = "https://api.fiw.fhws.de/auth/api/users/me"
 
 class User(BaseModel):
     email: str
-    current_token: str
     role: str
 
 
@@ -29,8 +28,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
+            detail="User not known. Please login regularly first.",
+            headers={"WWW-Authenticate": "Basic"},
         )
     return user
 
@@ -47,28 +46,25 @@ def user_login(login_data: str):
     user_email = json["emailAddress"]
     role = json["role"]
 
-    add_user(user_email, token, role)
+    add_user(user_email, role)
 
     return token
 
 
-def add_user(email: str, token: str, role: str):
+def add_user(email: str, role: str):
     user = next((x for x in active_users if x.email == email), None)
 
     if not user:
-        active_users.append(User(email=email, current_token=token, role=role))
-    else:
-        user.current_token = token
+        active_users.append(User(email=email, role=role))
 
 
-def refresh_login(user: User):
-    headers = {"Authorization": "Bearer " + user.current_token}
+def refresh_login(token: str = Depends(oauth2_scheme)):
+    headers = {"Authorization": "Bearer " + token}
 
     response = authorize_with_fhws(headers, "Invalid token", {"WWW-Authenticate": "Bearer"})
 
-    token = response.headers.get("X-fhws-jwt-token")
-    user.current_token = token
-    return token
+    token_new = response.headers.get("X-fhws-jwt-token")
+    return token_new
 
 
 def authorize_with_fhws(headers, detail, exception_headers):
