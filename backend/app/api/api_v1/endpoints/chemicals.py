@@ -2,7 +2,6 @@ from pydantic.main import BaseModel
 from sqlalchemy.orm import Session
 from starlette import status
 
-from app import schemas
 from app.api.user_management import User, get_current_user
 from app.db import chemicals_crud
 from app.db.session import get_db
@@ -10,7 +9,7 @@ from app.prediction.prediction_engine import predict_with_model, MlModel
 from app.db.chemicals_schema import ChemicalCreate, Chemical
 from fastapi import APIRouter, Depends, Query, HTTPException
 
-from typing import List
+from typing import List, Optional
 
 router = APIRouter()
 
@@ -71,18 +70,19 @@ async def predict_chemical_toxicity(
 
 
 @router.put("/smiles/{smiles}", response_model=PredictionAnswer)
-async def predict_chemical_toxicity(
+async def update_chemical(
         smiles: str,
         label: int = Query(..., ge=0, le=1),
         current_user: User = Depends(get_current_user),
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        code: Optional[str] = None
 ):
     if current_user.role == "student":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid permissions.",
         )
-    chemicals_crud.update_chemical(db, smiles, label)
+    chemicals_crud.update_chemical(db, smiles, label, code)
 
     chem_db = chemicals_crud.get_chemical_by_smiles(db, smiles)
     return PredictionAnswer(chemical=chem_db, new=False)

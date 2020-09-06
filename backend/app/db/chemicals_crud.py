@@ -40,10 +40,15 @@ def create_chemical(db: Session, chemical: ChemicalCreate):
     return db_chemical
 
 
-def update_chemical(db: Session, smiles: str, label: int):
-    get_by_smiles_query(db, smiles).update({Chemical.label: label, Chemical.predicted: False})
+def update_chemical(db: Session, smiles: str, label: int, code: str):
+    get_by_smiles_query(db, smiles).update({Chemical.label: label, Chemical.code: update_code(code), Chemical.predicted: False})
     db.commit()
 
 
+def update_code(code: str):
+    if code is not None:
+        return code
+    else:
+        return Chemical.code
 
 
