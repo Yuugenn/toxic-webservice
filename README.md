@@ -1,13 +1,10 @@
 # toxic-webservice
 
 ## Features
-- **FastAPI** with Python 3.8
+- **FastAPI** with Python 3.7
 - **React 16** with Typescript, Redux, and react-router
 - Postgres
 - SqlAlchemy with Alembic for migrations
-- Pytest for backend tests
-- Jest for frontend tests
-- Eslint (with Airbnb style guide)
 - Docker compose for easier development
 
 ## Development
@@ -72,25 +69,6 @@ alembic revision -m "create users table"
 And fill in `upgrade` and `downgrade` methods.  For more information see
 [Alembic's official documentation](https://alembic.sqlalchemy.org/en/latest/tutorial.html#create-a-migration-script).
 
-## Testing
-
-There is a helper script for both frontend and backend tests:
-```
-./scripts/test.sh
-```
-
-### Backend Tests
-```
-docker-compose run backend pytest
-```
-any arguments to pytest can also be passed after this command
-
-### Frontend Tests
-```
-docker-compose run frontend test
-```
-This is the same as running npm test from within the frontend directory
-
 ## Logging
 ```
 docker-compose logs
@@ -110,9 +88,10 @@ backend
     ├── api
     │   └── api_v1
     │       └── endpoints
+    |           ├──chemicals
+    |           └──login
     ├── core    # config
-    ├── db      # db models
-    ├── tests   # pytest
+    ├── db      # db models and config
     └── main.py # entrypoint to backend
 
 frontend
