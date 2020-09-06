@@ -19,18 +19,18 @@ async def login(
 
 
 @router.get("/refresh")
-async def read_users_me(current_user: User = Depends(get_current_user),
+async def token_refresh(current_user: User = Depends(get_current_user),
                         token: str = Depends(refresh_login)):
     return {"access_token": token, "token_type": "bearer", "expires-in": "30m"}
 
 
 @router.get("/users/me")
-async def read_users_me(current_user: User = Depends(get_current_user)):
+async def users_me(current_user: User = Depends(get_current_user)):
     return {"user": current_user, "token_type": "bearer"}
 
 
 @router.get("/users/all")
-async def read_users_me(current_user: User = Depends(get_current_user)):
+async def users_all(current_user: User = Depends(get_current_user)):
     if current_user.role == "student":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
