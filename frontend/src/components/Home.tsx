@@ -1,5 +1,5 @@
 import {makeStyles} from '@material-ui/core';
-import {Button, CircularProgress, Paper, SvgIcon, Table, TableBody, TableCell, TableRow, TextField, Typography} from "@material-ui/core";
+import {Button, CircularProgress, FormControl, MenuItem, Paper, Select, SvgIcon, Table, TableBody, TableCell, TableRow, TextField, Typography} from "@material-ui/core";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import React, {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
@@ -18,8 +18,9 @@ const useStyles = makeStyles((theme) => ({
   textField: {
       flex: 1
   },
-  button: {
-      marginLeft: "16px"
+  algorithm: {
+      marginLeft: "16px",
+      marginRight: "16px"
   },
   heading: {
       margin: "2em 0 1em 0"
@@ -51,8 +52,9 @@ function Home() {
     const { accessToken } = useParams();
 
     const [token,                 setToken                ] = useState<string>( "" );
-    const [chemicals,             setChemicals            ] = useState( [] );
     const [input,                 setInput                ] = useState<string>( "" );
+    const [lastSearchTerms,       setLastSearchTerms      ] = useState<string[]>( [] );
+    const [selectedAlgorithm,     setSelectedAlgorithm    ] = useState<string>( "CNB" );
     const [showInfos,             setShowInfos            ] = useState<boolean>( false );
     const [chemicalInfo,          setChemicalInfo         ] = useState<any>( {} );
     const [chemicalInfoIsLoading, setChemicalInfoIsLoading] = useState<boolean>( false );
@@ -91,6 +93,13 @@ function Home() {
 
         await checkIfAuthorized();
 
+        if( ! lastSearchTerms.includes(input) )
+        {
+            lastSearchTerms.push( input );
+
+            setLastSearchTerms( lastSearchTerms );
+        }
+
         setShowInfos( true );
 
         fetchChemicalInfos();
@@ -118,9 +127,11 @@ function Home() {
 
         const response = await fetch( `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/fastidentity/smiles/${input}/JSON` );
 
-        if( response.status !== 200 ) {
+        if( response.status !== 200 )
+        {
             setChemicalInfo( "Error!" );
             setChemicalInfoIsLoading( false );
+            return;
         }
 
         const json = await response.json();
@@ -154,7 +165,15 @@ function Home() {
         const headers = new Headers();
               headers.append( "Authorization", `Bearer ${token}` );
 
-        const response = await fetch( `${BACKEND_URL}/chemicals/smiles/${input}`, { method: "POST", headers: headers });
+        const response = await fetch( `${BACKEND_URL}/chemicals/smiles/${input}?model=${selectedAlgorithm}`, { method: "POST", headers: headers });
+
+        if( response.status !== 200 )
+        {
+            setResult( "Error!" );
+            setResultIsLoading( false );
+            return;
+        }
+
         const result = await response.json();
 
         setResultIsLoading( false );
@@ -170,12 +189,18 @@ function Home() {
     }
 
 
-    return (<>
+    return(<>
         <NavigationBar logout={true} />
         <Paper className="paper">
 		    <div className={classes.row}>
-		        <Autocomplete freeSolo options={chemicals} className={classes.textField} onChange={(e:any, value:any) => { if(value != null) handleOnInputChange(value.smiles); }} getOptionLabel={(option:any) => option.smiles} renderInput={(params) => <TextField {...params} placeholder="SMILES" variant="outlined" onChange={(e:any) => handleOnInputChange(e. target.value)} />} />
-		        <Button variant="contained" color="primary" className={classes.button} onClick={fetchInfos}><SvgIcon>{SearchIcon}</SvgIcon></Button>
+		        <Autocomplete freeSolo options={lastSearchTerms} className={classes.textField} onChange={(e:any, value:any) => { if(value != null) handleOnInputChange(value.smiles); }} renderInput={(params) => <TextField {...params} placeholder="SMILES" variant="outlined" onChange={(e:any) => handleOnInputChange(e.target.value)} />} />
+                <FormControl variant="outlined" className={classes.algorithm}>
+                    <Select value={selectedAlgorithm} onChange={(e:any) => setSelectedAlgorithm(e.target.value)}>
+                        <MenuItem value={"CNB"}>Complement Naive Bayes</MenuItem>
+                        <MenuItem value={"GNB"}>Gaussian Naive Bayes</MenuItem>
+                    </Select>
+                </FormControl>
+		        <Button variant="contained" color="primary" onClick={fetchInfos}><SvgIcon>{SearchIcon}</SvgIcon></Button>
 		    </div>
             {showInfos &&
             <div>
@@ -183,7 +208,7 @@ function Home() {
                 <canvas id="smiles-drawer" />
 
                 <Typography variant="h6" className={classes.heading}>Properties</Typography>
-                {chemicalInfoIsLoading ? <CircularProgress /> :
+                {chemicalInfoIsLoading ? <CircularProgress /> : (chemicalInfo === "Error!") ? <span>{chemicalInfo}</span> :
                     <Table className={classes.table}>
                         <TableBody>
                             <TableRow>
