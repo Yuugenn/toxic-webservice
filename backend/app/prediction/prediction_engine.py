@@ -1,4 +1,3 @@
-import traceback
 from enum import Enum
 
 from fastapi import HTTPException
