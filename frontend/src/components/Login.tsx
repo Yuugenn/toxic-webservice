@@ -66,10 +66,11 @@ function Login() {
         // prevent reload of the site (form submit)
         event.preventDefault();
 
+		setLoginError( "" );
+
         if( ! isFormCorrect() )
             return;
 
-        setLoginError( "" );
         setLoading( true );
 
         const formData = new FormData();

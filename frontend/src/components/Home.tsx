@@ -100,7 +100,7 @@ function Home() {
 
         if( ! lastSearchTerms.includes(input) )
         {
-            lastSearchTerms.push( input );
+            lastSearchTerms.unshift( input );
 
             setLastSearchTerms( lastSearchTerms );
         }
