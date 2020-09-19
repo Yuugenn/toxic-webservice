@@ -102,8 +102,14 @@ function Login() {
     }
 
 
+    const refresh = () => {
+
+        window.location.reload();
+    }
+
+
     return (<>
-        <NavigationBar logout={false} />
+        <NavigationBar logout={false} onLogoClick={refresh} />
         <Paper className="paper">
             <form className={classes.form} onSubmit={login}>
                 <span>K-Number</span>

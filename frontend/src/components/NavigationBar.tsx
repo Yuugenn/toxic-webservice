@@ -13,7 +13,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 	},
 	brand: {
 		display: 'flex',
-		alignItems: 'center'
+		alignItems: 'center',
+		cursor: 'pointer'
 	},
 	logo: {
 		marginRight: theme.spacing(2)
@@ -39,7 +40,7 @@ function NavigationBar( props:any ) {
 	return (
         <AppBar position="sticky" color="primary">
             <Toolbar className={classes.toolbar}>
-				<div className={classes.brand}>
+				<div className={classes.brand} onClick={props.onLogoClick}>
                 	<WarningIcon className={classes.logo} />
                 	<Typography variant="h6">Toxic Webservice</Typography>
 				</div>

@@ -91,6 +91,11 @@ function Home() {
 
     const fetchInfos = async () => {
 
+        if( input === "" )
+        {
+            return;
+        }
+
         await checkIfAuthorized();
 
         if( ! lastSearchTerms.includes(input) )
@@ -189,11 +194,19 @@ function Home() {
     }
 
 
+    const onLogoClick = () => {
+
+        handleOnInputChange( "" );
+
+        setSelectedAlgorithm( "CNB" );
+    }
+
+
     return(<>
-        <NavigationBar logout={true} />
+        <NavigationBar logout={true} onLogoClick={onLogoClick} />
         <Paper className="paper">
 		    <div className={classes.row}>
-		        <Autocomplete freeSolo options={lastSearchTerms} className={classes.textField} onChange={(e:any, value:any) => { if(value != null) handleOnInputChange(value); }} renderInput={(params) => <TextField {...params} placeholder="SMILES" variant="outlined" onChange={(e:any) => handleOnInputChange(e.target.value)} />} />
+		        <Autocomplete freeSolo options={lastSearchTerms} className={classes.textField} onChange={(e:any, value:any) => { if(value != null) handleOnInputChange(value); }} value={input} renderInput={(params) => <TextField {...params} placeholder="SMILES" variant="outlined" value={input} onChange={(e:any) => handleOnInputChange(e.target.value)} />} />
                 <FormControl variant="outlined" className={classes.algorithm}>
                     <Select value={selectedAlgorithm} onChange={(e:any) => setSelectedAlgorithm(e.target.value)}>
                         <MenuItem value={"CNB"}>Complement Naive Bayes</MenuItem>
