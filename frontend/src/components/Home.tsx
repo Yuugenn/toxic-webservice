@@ -193,7 +193,7 @@ function Home() {
         <NavigationBar logout={true} />
         <Paper className="paper">
 		    <div className={classes.row}>
-		        <Autocomplete freeSolo options={lastSearchTerms} className={classes.textField} onChange={(e:any, value:any) => { if(value != null) handleOnInputChange(value.smiles); }} renderInput={(params) => <TextField {...params} placeholder="SMILES" variant="outlined" onChange={(e:any) => handleOnInputChange(e.target.value)} />} />
+		        <Autocomplete freeSolo options={lastSearchTerms} className={classes.textField} onChange={(e:any, value:any) => { if(value != null) handleOnInputChange(value); }} renderInput={(params) => <TextField {...params} placeholder="SMILES" variant="outlined" onChange={(e:any) => handleOnInputChange(e.target.value)} />} />
                 <FormControl variant="outlined" className={classes.algorithm}>
                     <Select value={selectedAlgorithm} onChange={(e:any) => setSelectedAlgorithm(e.target.value)}>
                         <MenuItem value={"CNB"}>Complement Naive Bayes</MenuItem>
